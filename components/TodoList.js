@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, ScrollView, View, StyleSheet } from 'react-native';
 import AddTodo from './AddTodo';
 import TodoItem from './TodoItem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [nextId, setNextId] = useState(1);
 
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedTodos = await getData('todos');
+      if (savedTodos) {
+        setTodos(savedTodos);
+      }
+    };
+    loadSavedData();
+  }, []);
+
+  const getData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      if (value !== null) {
+        return JSON.parse(value);
+      }
+    } catch (error) {
+      alert(`Error retrieving data:${error}`);
+    }
+  };
+
+  const saveData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      alert('Error saving data:', error);
+    }
+  };
+
   const addTodo = (text) => {
     const newTodo = { id: nextId, text, completed: false, pinned: false };
-    setTodos([...todos, newTodo]);
+    const updatedTodos = [...todos, newTodo];
+    setTodos(updatedTodos);
+    saveData('todos', updatedTodos);
     setNextId(nextId + 1);
   };
 
@@ -19,6 +51,7 @@ const TodoList = () => {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
+    saveData('todos', todos);
   };
 
   const editTodo = (id, text) => {
@@ -27,10 +60,12 @@ const TodoList = () => {
         todo.id === id ? { ...todo, text } : todo
       )
     );
+    saveData('todos', todos);
   };
 
   const deleteTodo = (id) => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    saveData('todos', todos);
   };
 
   const togglePin = (id) => {
@@ -39,6 +74,7 @@ const TodoList = () => {
         todo.id === id ? { ...todo, pinned: !todo.pinned } : todo
       )
     );
+    saveData('todos', todos);
   };
 
   const sortTodos = (todos) => {
