@@ -13,6 +13,7 @@ const TodoList = () => {
       const savedTodos = await getData('todos');
       if (savedTodos) {
         setTodos(savedTodos);
+        setNextId(getNextId(savedTodos));
       }
     };
     loadSavedData();
@@ -35,6 +36,14 @@ const TodoList = () => {
     } catch (error) {
       alert('Error saving data:', error);
     }
+  };
+
+  const getNextId = (list) => {
+    if (list.length === 0) {
+      return 1;
+    }
+    const maxId = Math.max(...list.map((todo) => todo.id));
+    return maxId + 1;
   };
 
   const addTodo = (text) => {
