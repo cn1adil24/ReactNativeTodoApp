@@ -26,7 +26,7 @@ const TodoList = () => {
         return JSON.parse(value);
       }
     } catch (error) {
-      alert(`Error retrieving data:${error}`);
+      alert(`Error retrieving data: ${error.message}`);
     }
   };
 
@@ -34,7 +34,7 @@ const TodoList = () => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      alert('Error saving data:', error);
+      alert(`Error saving data: ${error.message}`);
     }
   };
 
@@ -55,35 +55,33 @@ const TodoList = () => {
   };
 
   const toggleTodo = (id) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
     );
-    saveData('todos', todos);
+    setTodos(updatedTodos);
+    saveData('todos', updatedTodos);
   };
 
   const editTodo = (id, text) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, text } : todo
-      )
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, text } : todo
     );
-    saveData('todos', todos);
+    setTodos(updatedTodos);
+    saveData('todos', updatedTodos);
   };
 
   const deleteTodo = (id) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-    saveData('todos', todos);
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(updatedTodos);
+    saveData('todos', updatedTodos);
   };
 
   const togglePin = (id) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, pinned: !todo.pinned } : todo
-      )
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, pinned: !todo.pinned } : todo
     );
-    saveData('todos', todos);
+    setTodos(updatedTodos);
+    saveData('todos', updatedTodos);
   };
 
   const sortTodos = (todos) => {
